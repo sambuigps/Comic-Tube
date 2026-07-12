@@ -1,1 +1,1 @@
-export const DB_NAME = "VisualComic"
+export const DB_NAME = "ComicTube"
