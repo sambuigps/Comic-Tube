@@ -29,6 +29,28 @@ const signup = asyncHandler(async (req, res) => {
         );
 });
 
+const login = asyncHandler(async (req, res) => {
+    const { emailOrUsername, password } = req.body;
+    const { user, accessToken, refreshToken } =
+        await authService.login({
+            emailOrUsername,
+            password,
+        });
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, accessTokenOptions)
+        .cookie("refreshToken", refreshToken, refreshTokenOptions)
+        .json(
+            new ApiResponse(
+                200,
+                user,
+                "Logged in successfully"
+            )
+        );
+});
+
 export {
     signup,
+    login,
 };

@@ -32,3 +32,14 @@ export const signupValidator = [
         .matches(/[!@#$%^&*(),.?":{}|<>]/)
         .withMessage("Password must contain at least one special character"),
 ];
+
+export const loginValidator = [
+    body("emailOrUsername")
+        .trim()
+        .notEmpty()
+        .withMessage("Email or Username is required"),
+
+    body("password")
+        .notEmpty()
+        .withMessage("Password is required"),
+];

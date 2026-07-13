@@ -56,6 +56,38 @@ const signup = async ({ username, email, password }) => {
     };
 };
 
+const login = async ({ emailOrUsername, password }) => {
+    const user = await User.findOne({
+        $or: [
+            { email: emailOrUsername.toLowerCase() },
+            { username: emailOrUsername.toLowerCase() }
+        ]
+    });
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+
+    if (!isPasswordCorrect) {
+        throw new ApiError(401, "Invalid credentials");
+    }
+
+    const { accessToken, refreshToken } =
+        await generateAccessAndRefreshTokens(user);
+
+    const loggedInUser = await User.findById(user._id)
+        .select("-password -refreshToken");
+
+    return {
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+    };
+};
+
 export {
     signup,
+    login
 };
