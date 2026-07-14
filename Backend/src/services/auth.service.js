@@ -87,7 +87,66 @@ const login = async ({ emailOrUsername, password }) => {
     };
 };
 
+const logout = async (userId) => {
+    await User.findByIdAndUpdate(
+        userId,
+        {
+            $unset: {
+                refreshToken: 1,
+            },
+        },
+        {
+            new: true,
+        }
+    );
+};
+
+import jwt from "jsonwebtoken";
+
+const refreshAccessToken = async (incomingRefreshToken) => {
+
+    if (!incomingRefreshToken) {
+        throw new ApiError(401, "Unauthorized request");
+    }
+
+    try {
+
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+
+        const user = await User.findById(decodedToken._id);
+
+        if (!user) {
+            throw new ApiError(401, "Invalid refresh token");
+        }
+
+        if (incomingRefreshToken !== user.refreshToken) {
+            throw new ApiError(401, "Refresh token expired or used");
+        }
+
+        const { accessToken, refreshToken } =
+            await generateAccessAndRefreshTokens(user);
+
+        return {
+            accessToken,
+            refreshToken,
+        };
+
+    } catch (error) {
+        throw new ApiError(401, "Invalid refresh token");
+    }
+};
+
+const getCurrentUser = async (user) => {
+    return user;
+};
+
 export {
     signup,
-    login
+    login,
+    logout,
+    refreshAccessToken,
+    getCurrentUser
 };
