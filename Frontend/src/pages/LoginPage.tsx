@@ -161,7 +161,14 @@ function LoginPage() {
             )}
           </div>
 
-          <br></br>
+          <div className="mt-2 text-right">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-400 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
           <button
             type="submit"
             disabled={loading}
