@@ -1,5 +1,79 @@
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { OAuth2Client } from "google-auth-library";
+import { generateUniqueUsername } from "../utils/generateUsername.js";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const googleLogin = async ({ idToken }) => {
+    if (!idToken) {
+        throw new ApiError(400, "Google ID token is required");
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+        throw new ApiError(401, "Invalid Google token");
+    }
+
+    const {
+        sub,
+        email,
+        name,
+        picture,
+        email_verified,
+    } = payload;
+
+    if (!email_verified) {
+        throw new ApiError(401, "Google account email is not verified");
+    }
+
+    let user = await User.findOne({
+        $or: [
+            { googleId: sub },
+            { email },
+        ],
+    });
+
+    if (!user) {
+        const username = await generateUniqueUsername(name, email);
+
+        user = await User.create({
+            username,
+            email,
+            avatar: picture || "/avatars/avatar.webp",
+            provider: "google",
+            googleId: sub,
+        });
+    } else if (!user.googleId) {
+        user.googleId = sub;
+
+        if (!user.avatar || user.avatar === "/avatars/avatar.webp") {
+            user.avatar = picture || user.avatar;
+        }
+
+        await user.save({
+            validateBeforeSave: false,
+        });
+    }
+
+    const { accessToken, refreshToken } =
+        await generateAccessAndRefreshTokens(user);
+
+    const loggedInUser = await User.findById(user._id)
+        .select("-password -refreshToken");
+
+    return {
+        user: loggedInUser,
+        accessToken,
+        refreshToken,
+    };
+};
 
 const generateAccessAndRefreshTokens = async (user) => {
     const accessToken = user.generateAccessToken();
@@ -148,5 +222,6 @@ export {
     login,
     logout,
     refreshAccessToken,
-    getCurrentUser
+    getCurrentUser,
+    googleLogin
 };

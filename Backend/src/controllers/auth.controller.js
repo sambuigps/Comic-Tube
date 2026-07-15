@@ -51,9 +51,7 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-
     await authService.logout(req.user._id);
-
     return res
         .status(200)
         .clearCookie("accessToken", accessTokenOptions)
@@ -99,9 +97,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-
     const user = await authService.getCurrentUser(req.user);
-
     return res.status(200).json(
         new ApiResponse(
             200,
@@ -111,10 +107,32 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
+const googleLogin = asyncHandler(async (req, res) => {
+    const { idToken } = req.body;
+    const {
+        user,
+        accessToken,
+        refreshToken,
+    } = await authService.googleLogin({ idToken });
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, accessTokenOptions)
+        .cookie("refreshToken", refreshToken, refreshTokenOptions)
+        .json(
+            new ApiResponse(
+                200,
+                user,
+                "Google login successful"
+            )
+        );
+});
+
 export {
     signup,
     login,
     logout,
     refreshAccessToken,
-    getCurrentUser
+    getCurrentUser,
+    googleLogin
 };

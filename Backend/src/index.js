@@ -1,8 +1,11 @@
 import dotenv from "dotenv";
-import connectDB from "./db/index.js";
-import { app } from "./app.js";
 
 dotenv.config();
+
+// console.log(result);
+console.log(process.env.CORS_ORIGIN);
+import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 connectDB()
 .then(()=>{

@@ -29,6 +29,12 @@ const userSchema = new Schema(
             },
         },
 
+        googleId: {
+            type: String,
+            unique: true,
+            sparse: true,
+            default: null,
+        },
         avatar: {
             type: String,
             default: "/avatars/avatar.webp",
@@ -120,7 +126,7 @@ userSchema.methods.generateResetPasswordToken = function () {
         .update(resetToken)
         .digest("hex");
 
-    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; 
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
     return resetToken;
 };

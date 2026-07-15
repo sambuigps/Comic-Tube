@@ -43,3 +43,9 @@ export const loginValidator = [
         .notEmpty()
         .withMessage("Password is required"),
 ];
+
+export const googleLoginValidator = [
+    body("idToken")
+        .notEmpty()
+        .withMessage("Google ID token is required"),
+];
