@@ -1,6 +1,6 @@
 import { LoaderCircle, Lock, Mail } from 'lucide-react'
 import { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, SyntheticEvent } from 'react'
 import { Link } from 'react-router-dom'
 
 function LoginPage() {
@@ -30,7 +30,7 @@ function LoginPage() {
     }))
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const newErrors = {
@@ -73,6 +73,28 @@ function LoginPage() {
         <p className="mb-8 text-center text-sm text-zinc-400">
           Sign in to Comic-Tube
         </p>
+
+        <button
+          type="button"
+          className="flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-zinc-700 bg-zinc-800 text-white transition hover:bg-zinc-700"
+        >
+          <img
+            src="/Icons/google-icon.webp"
+            alt="Google"
+            className="h-5 w-5"
+          />
+          <span className="font-medium">Continue with Google</span>
+        </button>
+
+        <div className="flex items-center my-6">
+          <div className="flex-grow border-t border-gray-300"></div>
+          
+          <span className="flex-shrink mx-2 text-sm font-medium text-gray-500 text-xl">
+            or
+          </span>
+          
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
@@ -139,15 +161,7 @@ function LoginPage() {
             )}
           </div>
 
-          <div className="mb-6 text-right">
-            <button
-              type="button"
-              className="text-sm text-blue-400 hover:underline"
-            >
-              Forgot Password?
-            </button>
-          </div>
-
+          <br></br>
           <button
             type="submit"
             disabled={loading}
