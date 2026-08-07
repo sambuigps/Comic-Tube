@@ -45,11 +45,6 @@ const userSchema = new Schema(
             default: "local",
         },
 
-        isGuest: {
-            type: Boolean,
-            default: false,
-        },
-
         refreshToken: {
             type: String,
             default: null,
