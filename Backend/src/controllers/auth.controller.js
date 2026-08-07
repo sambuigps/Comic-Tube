@@ -7,7 +7,7 @@ import {
 } from "../utils/cookieOptions.js";
 
 const signup = asyncHandler(async (req, res) => {
-    const { username, email, password } = req.body;
+    const { platformType ,username, email, password } = req.body;
 
     const { user, accessToken, refreshToken } =
         await authService.signup({
@@ -16,7 +16,8 @@ const signup = asyncHandler(async (req, res) => {
             password,
         });
 
-    return res
+    if(platformType === "web") {
+        return res
         .status(201)
         .cookie("accessToken", accessToken, accessTokenOptions)
         .cookie("refreshToken", refreshToken, refreshTokenOptions)
@@ -27,17 +28,30 @@ const signup = asyncHandler(async (req, res) => {
                 "User registered successfully"
             )
         );
+    }
+    else{
+        return res
+        .status(201)
+        .json(
+            new ApiResponse(
+                201,
+                { user, accessToken, refreshToken },
+                "User registered successfully"
+            )
+        );
+    }
 });
 
 const login = asyncHandler(async (req, res) => {
-    const { emailOrUsername, password } = req.body;
+    const { platformType, emailOrUsername, password } = req.body;
     const { user, accessToken, refreshToken } =
         await authService.login({
             emailOrUsername,
             password,
         });
 
-    return res
+    if(platformType === "web") {
+        return res
         .status(200)
         .cookie("accessToken", accessToken, accessTokenOptions)
         .cookie("refreshToken", refreshToken, refreshTokenOptions)
@@ -45,14 +59,28 @@ const login = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 user,
-                "Logged in successfully"
+                "User logged in successfully"
             )
         );
+    }
+    else{
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                { user, accessToken, refreshToken },
+                "User logged in successfully"
+            )
+        );
+    }
 });
 
 const logout = asyncHandler(async (req, res) => {
     await authService.logout(req.user._id);
-    return res
+
+    if(req.platformType === "web") {
+        return res
         .status(200)
         .clearCookie("accessToken", accessTokenOptions)
         .clearCookie("refreshToken", refreshTokenOptions)
@@ -63,6 +91,17 @@ const logout = asyncHandler(async (req, res) => {
                 "Logged out successfully"
             )
         );
+    }else{
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Logged out successfully"
+            )
+        );
+    }
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
