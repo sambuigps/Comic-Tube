@@ -100,7 +100,7 @@ const signup = async ({ username, email, password }) => {
     });
 
     if (existingUser) {
-        if (existingUser.username === username) {
+        if (existingUser.username === username.toLowerCase()) {
             throw new ApiError(409, "Username already exists");
         }
 
