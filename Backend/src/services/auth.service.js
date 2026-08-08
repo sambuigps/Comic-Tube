@@ -100,11 +100,7 @@ const signup = async ({ username, email, password }) => {
     });
 
     if (existingUser) {
-        if (existingUser.username === username.toLowerCase()) {
-            throw new ApiError(409, "Username already exists");
-        }
-
-        throw new ApiError(409, "Email already exists");
+        throw new ApiError(409, "Username/Email already exists");
     }
 
     const user = await User.create({
@@ -139,7 +135,7 @@ const login = async ({ emailOrUsername, password }) => {
     });
 
     if (!user) {
-        throw new ApiError(404, "User not found");
+        throw new ApiError(401, "Invalid credentials");
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(password);
