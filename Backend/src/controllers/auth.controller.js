@@ -114,25 +114,17 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             incomingRefreshToken
         );
 
-    return res
-        .status(200)
-        .cookie(
-            "accessToken",
-            accessToken,
-            accessTokenOptions
-        )
-        .cookie(
-            "refreshToken",
-            refreshToken,
-            refreshTokenOptions
-        )
-        .json(
-            new ApiResponse(
-                200,
-                {},
-                "Access token refreshed successfully"
-            )
-        );
+    if (req.platformType === "web") {
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, accessTokenOptions)
+            .cookie("refreshToken", refreshToken, refreshTokenOptions)
+            .json(new ApiResponse(200, {}, "Access token refreshed successfully"));
+    } else {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, { accessToken, refreshToken }, "Access token refreshed successfully"));
+    }
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
