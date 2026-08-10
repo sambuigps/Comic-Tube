@@ -29,7 +29,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "mongoose-aggregate-paginate-v2": "^1.1.4",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
