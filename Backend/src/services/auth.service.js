@@ -2,6 +2,11 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { OAuth2Client } from "google-auth-library";
 import { generateUniqueUsername } from "../utils/generateUsername.js";
+import jwt from "jsonwebtoken";
+import { PendingUser } from "../models/pendingUser.model.js";
+import generateOtp from "../Factories/otp.factory.js";
+import sendMail from "../utils/mailer.js";
+import signUpOtpEmail from "../Factories/signUpOtpEmail.factory.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -103,27 +108,52 @@ const signup = async ({ username, email, password }) => {
         throw new ApiError(409, "Username/Email already exists");
     }
 
-    const user = await User.create({
+    const existingPendingEmail = await PendingUser.findOne({ email });
+
+    const existingPendingUsername = await PendingUser.findOne({ username });
+
+    if (existingPendingEmail) {
+        const samePendingUser =
+            existingPendingUsername &&
+            existingPendingEmail._id.equals(existingPendingUsername._id);
+
+        if (!existingPendingUsername || samePendingUser) {
+            await PendingUser.deleteOne({ _id: existingPendingEmail._id });
+        } else {
+            throw new ApiError(409, "Username/Email already exists");
+        }
+    } else if (existingPendingUsername) {
+        throw new ApiError(409, "Username/Email already exists");
+    }
+
+    const {otp, otpHash} = generateOtp();
+
+    const user = await PendingUser.create({
         username,
         email,
-        password,
+        otpHash
     });
 
     if (!user) {
-        throw new ApiError(500, "Failed to create user");
+        throw new ApiError(500, "Failed to sign up");
     }
 
-    const { accessToken, refreshToken } =
-        await generateAccessAndRefreshTokens(user);
+    const {body, subject} = signUpOtpEmail(otp, username);
 
-    const createdUser = await User.findById(user._id)
-        .select("-password -refreshToken");
+    await sendMail(email, subject, body);
+    
+    return;
+    // const { accessToken, refreshToken } =
+    //     await generateAccessAndRefreshTokens(user);
 
-    return {
-        user: createdUser,
-        accessToken,
-        refreshToken,
-    };
+    // const createdUser = await User.findById(user._id)
+    //     .select("-password -refreshToken");
+
+    // return {
+    //     user: createdUser,
+    //     accessToken,
+    //     refreshToken,
+    // };
 };
 
 const login = async ({ emailOrUsername, password }) => {
@@ -170,8 +200,6 @@ const logout = async (userId) => {
         }
     );
 };
-
-import jwt from "jsonwebtoken";
 
 const refreshAccessToken = async (incomingRefreshToken) => {
 

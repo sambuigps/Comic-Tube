@@ -1,6 +1,9 @@
+import { body } from "express-validator";
 import { App_NAME } from "../constants.js";
-export default function signUpOtpEmail( otp, username) {
-    return `
+export default function signUpOtpEmail(otp, username) {
+    return {
+        subject: `Welcome to ${App_NAME}`,
+        body: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -136,5 +139,5 @@ export default function signUpOtpEmail( otp, username) {
             </div>
         </body>
         </html>
-    `;
+    `}
 }

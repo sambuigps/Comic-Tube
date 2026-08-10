@@ -1,5 +1,3 @@
-// utils/mailer.js
-
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -10,7 +8,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export async function sendMail(to, subject, body) {
+export default async function sendMail(to, subject, body) {
     return transporter.sendMail({
         from: `"Comic-Tube" <${process.env.BUSINESS_EMAIL}>`,
         to,

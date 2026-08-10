@@ -9,37 +9,37 @@ import {
 const signup = asyncHandler(async (req, res) => {
     const { platformType ,username, email, password } = req.body;
 
-    const { user, accessToken, refreshToken } =
-        await authService.signup({
-            username,
-            email,
-            password,
-        });
+    await authService.signup({
+        username,
+        email,
+        password,
+    });
 
-    if(platformType === "web") {
-        return res
-        .status(201)
-        .cookie("accessToken", accessToken, accessTokenOptions)
-        .cookie("refreshToken", refreshToken, refreshTokenOptions)
-        .json(
-            new ApiResponse(
-                201,
-                user,
-                "User registered successfully"
-            )
-        );
-    }
-    else{
-        return res
-        .status(201)
-        .json(
-            new ApiResponse(
-                201,
-                { user, accessToken, refreshToken },
-                "User registered successfully"
-            )
-        );
-    }
+    return;
+    // if(platformType === "web") {
+    //     return res
+    //     .status(201)
+    //     .cookie("accessToken", accessToken, accessTokenOptions)
+    //     .cookie("refreshToken", refreshToken, refreshTokenOptions)
+    //     .json(
+    //         new ApiResponse(
+    //             201,
+    //             user,
+    //             "User registered successfully"
+    //         )
+    //     );
+    // }
+    // else{
+    //     return res
+    //     .status(201)
+    //     .json(
+    //         new ApiResponse(
+    //             201,
+    //             { user, accessToken, refreshToken },
+    //             "User registered successfully"
+    //         )
+    //     );
+    // }
 });
 
 const login = asyncHandler(async (req, res) => {
