@@ -7,8 +7,9 @@ import { PendingUser } from "../models/pendingUser.model.js";
 import generateOtp from "../Factories/otp.factory.js";
 import sendMail from "../utils/mailer.js";
 import signUpOtpEmail from "../Factories/signUpOtpEmail.factory.js";
+import { AUTH_OTP_EXPIRY, GOOGLE_CLIENT_ID, REFRESH_TOKEN_SECRET } from "../config/config.js";
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const googleLogin = async ({ idToken }) => {
     if (!idToken) {
@@ -17,7 +18,7 @@ const googleLogin = async ({ idToken }) => {
 
     const ticket = await googleClient.verifyIdToken({
         idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -133,7 +134,7 @@ const signup = async ({ username, email, password }) => {
         email,
         password,
         otp,
-        expiresAt: new Date(Date.now() + 1000*Number(process.env.AUTH_OTP_EXPIRY))
+        expiresAt: new Date(Date.now() + 1000 * AUTH_OTP_EXPIRY)
     });
 
     if (!user) {
@@ -149,7 +150,7 @@ const signup = async ({ username, email, password }) => {
 
 const verifyOtp = async ({ email, otp }) => {
 
-    const pendingUser = await PendingUser.findOne({email});
+    const pendingUser = await PendingUser.findOne({ email });
 
     if (!pendingUser) {
         throw new ApiError(404, "Otp expired");
@@ -184,7 +185,7 @@ const verifyOtp = async ({ email, otp }) => {
 
     const { accessToken, refreshToken } =
         await generateAccessAndRefreshTokens(user);
-    
+
     const createdUser = await User.findById(user._id)
         .select("-password -refreshToken");
 
@@ -252,7 +253,7 @@ const refreshAccessToken = async (incomingRefreshToken) => {
 
         const decodedToken = jwt.verify(
             incomingRefreshToken,
-            process.env.REFRESH_TOKEN_SECRET
+            REFRESH_TOKEN_SECRET
         );
 
         const user = await User.findById(decodedToken._id);

@@ -2,13 +2,14 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
+import { CORS_ORIGIN } from "./config/config.js";
 
 const app = express();
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: CORS_ORIGIN,
     credentials: true
 }));
-console.log("CORS_ORIGIN:", process.env.CORS_ORIGIN);
+console.log("CORS_ORIGIN:", CORS_ORIGIN);
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
