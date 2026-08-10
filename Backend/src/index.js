@@ -1,9 +1,4 @@
-import dotenv from "dotenv";
-
-dotenv.config();
-
-// console.log(result);
-console.log(process.env.CORS_ORIGIN);
+import dotenv from "dotenv/config";
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 
