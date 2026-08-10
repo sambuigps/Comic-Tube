@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 const pendingUserSchema = new Schema(
     {
@@ -19,18 +20,40 @@ const pendingUserSchema = new Schema(
             trim: true,
         },
 
-        otpHash: {
+        otp: {
             type: String,
             required: true,
             trim: true
         },
 
-        createdAt: {
+        password: {
+            type: String,
+            required: true,
+        },
+
+        expiresAt: {
             type: Date,
-            default: Date.now,
-            expires: process.env.AUTH_OTP_EXPIRY
+            required: true
         },
     }
 );
+
+pendingUserSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+pendingUserSchema.pre("save", async function () {
+    if (this.isModified("password") && this.password) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+
+    if (this.isModified("otp") && this.otp) {
+        this.otp = await bcrypt.hash(this.otp, 10);
+    }
+});
+
+pendingUserSchema.methods.isOtpCorrect = async function (otp) {
+    if (!this.otp) return false;
+
+    return bcrypt.compare(otp, this.otp);
+};
 
 export const PendingUser = mongoose.model("PendingUser", pendingUserSchema);

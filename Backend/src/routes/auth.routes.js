@@ -14,6 +14,11 @@ router.post(
 );
 
 router.post(
+    "/verifyOtp",
+    authController.verifyOtp
+);
+
+router.post(
     "/login",
     loginValidator,
     validate,

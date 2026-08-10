@@ -5,9 +5,10 @@ import {
     accessTokenOptions,
     refreshTokenOptions,
 } from "../utils/cookieOptions.js";
+import { PendingUser } from "../models/pendingUser.model.js";
 
 const signup = asyncHandler(async (req, res) => {
-    const { platformType ,username, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     await authService.signup({
         username,
@@ -15,31 +16,48 @@ const signup = asyncHandler(async (req, res) => {
         password,
     });
 
-    return;
-    // if(platformType === "web") {
-    //     return res
-    //     .status(201)
-    //     .cookie("accessToken", accessToken, accessTokenOptions)
-    //     .cookie("refreshToken", refreshToken, refreshTokenOptions)
-    //     .json(
-    //         new ApiResponse(
-    //             201,
-    //             user,
-    //             "User registered successfully"
-    //         )
-    //     );
-    // }
-    // else{
-    //     return res
-    //     .status(201)
-    //     .json(
-    //         new ApiResponse(
-    //             201,
-    //             { user, accessToken, refreshToken },
-    //             "User registered successfully"
-    //         )
-    //     );
-    // }
+    return res
+        .status(200, "Otp sent successfully")
+        .json(
+            new ApiResponse(
+                200,
+                null,
+                "Otp sent successfully"
+            )
+        );
+});
+
+const verifyOtp = asyncHandler(async (req, res) => {
+    const { platformType, email, otp } = req.body;
+    const { user, refreshToken, accessToken } = await authService.verifyOtp({
+        email,
+        otp
+    });
+
+    if (platformType === "web") {
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, accessTokenOptions)
+            .cookie("refreshToken", refreshToken, refreshTokenOptions)
+            .json(
+                new ApiResponse(
+                    200,
+                    user,
+                    "User registered successfully"
+                )
+            );
+    }
+    else {
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { user, accessToken, refreshToken },
+                    "User registered successfully"
+                )
+            );
+    }
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -50,57 +68,57 @@ const login = asyncHandler(async (req, res) => {
             password,
         });
 
-    if(platformType === "web") {
+    if (platformType === "web") {
         return res
-        .status(200)
-        .cookie("accessToken", accessToken, accessTokenOptions)
-        .cookie("refreshToken", refreshToken, refreshTokenOptions)
-        .json(
-            new ApiResponse(
-                200,
-                user,
-                "User logged in successfully"
-            )
-        );
+            .status(200)
+            .cookie("accessToken", accessToken, accessTokenOptions)
+            .cookie("refreshToken", refreshToken, refreshTokenOptions)
+            .json(
+                new ApiResponse(
+                    200,
+                    user,
+                    "User logged in successfully"
+                )
+            );
     }
-    else{
+    else {
         return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                { user, accessToken, refreshToken },
-                "User logged in successfully"
-            )
-        );
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { user, accessToken, refreshToken },
+                    "User logged in successfully"
+                )
+            );
     }
 });
 
 const logout = asyncHandler(async (req, res) => {
     await authService.logout(req.user._id);
 
-    if(req.platformType === "web") {
+    if (req.platformType === "web") {
         return res
-        .status(200)
-        .clearCookie("accessToken", accessTokenOptions)
-        .clearCookie("refreshToken", refreshTokenOptions)
-        .json(
-            new ApiResponse(
-                200,
-                {},
-                "Logged out successfully"
-            )
-        );
-    }else{
+            .status(200)
+            .clearCookie("accessToken", accessTokenOptions)
+            .clearCookie("refreshToken", refreshTokenOptions)
+            .json(
+                new ApiResponse(
+                    200,
+                    {},
+                    "Logged out successfully"
+                )
+            );
+    } else {
         return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                {},
-                "Logged out successfully"
-            )
-        );
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    {},
+                    "Logged out successfully"
+                )
+            );
     }
 });
 
@@ -161,6 +179,7 @@ const googleLogin = asyncHandler(async (req, res) => {
 
 export {
     signup,
+    verifyOtp,
     login,
     logout,
     refreshAccessToken,

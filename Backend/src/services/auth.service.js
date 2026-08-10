@@ -126,35 +126,76 @@ const signup = async ({ username, email, password }) => {
         throw new ApiError(409, "Username/Email already exists");
     }
 
-    const {otp, otpHash} = generateOtp();
+    const otp = generateOtp();
 
     const user = await PendingUser.create({
         username,
         email,
-        otpHash
+        password,
+        otp,
+        expiresAt: new Date(Date.now() + 1000*Number(process.env.AUTH_OTP_EXPIRY))
     });
 
     if (!user) {
         throw new ApiError(500, "Failed to sign up");
     }
 
-    const {body, subject} = signUpOtpEmail(otp, username);
+    const { body, subject } = signUpOtpEmail(otp, username);
 
-    await sendMail(email, subject, body);
-    
+    sendMail(email, subject, body);
+
     return;
-    // const { accessToken, refreshToken } =
-    //     await generateAccessAndRefreshTokens(user);
-
-    // const createdUser = await User.findById(user._id)
-    //     .select("-password -refreshToken");
-
-    // return {
-    //     user: createdUser,
-    //     accessToken,
-    //     refreshToken,
-    // };
 };
+
+const verifyOtp = async ({ email, otp }) => {
+
+    const pendingUser = await PendingUser.findOne({email});
+
+    if (!pendingUser) {
+        throw new ApiError(404, "Otp expired");
+    }
+
+    const isOtpCorrect = await pendingUser.isOtpCorrect(otp);
+
+    if (!isOtpCorrect) {
+        throw new ApiError(400, "Entered otp was not correct.");
+    }
+
+    const existingUser = await User.findOne({
+        $or: [
+            { username: pendingUser.username },
+            { email: pendingUser.email },
+        ],
+    });
+
+    if (existingUser) {
+        throw new ApiError(409, "Username/Email already exists");
+    }
+
+    const user = await User.create({
+        username: pendingUser.username,
+        email: pendingUser.email,
+        password: pendingUser.password,
+    });
+
+    if (!user) {
+        throw new ApiError(500, "Failed to sign up");
+    }
+
+    const { accessToken, refreshToken } =
+        await generateAccessAndRefreshTokens(user);
+    
+    const createdUser = await User.findById(user._id)
+        .select("-password -refreshToken");
+
+    await PendingUser.deleteOne({ _id: pendingUser._id });
+
+    return {
+        user: createdUser,
+        accessToken,
+        refreshToken,
+    };
+}
 
 const login = async ({ emailOrUsername, password }) => {
     const user = await User.findOne({
@@ -243,6 +284,7 @@ const getCurrentUser = async (user) => {
 
 export {
     signup,
+    verifyOtp,
     login,
     logout,
     refreshAccessToken,

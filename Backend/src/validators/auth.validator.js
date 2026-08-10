@@ -30,7 +30,24 @@ export const signupValidator = [
         .matches(/[0-9]/)
         .withMessage("Password must contain at least one number")
         .matches(/[!@#$%^&*(),.?":{}|<>_\-+=/\\[\];'`~]/)
-        .withMessage("Password must contain at least one special character"),
+        .withMessage("Password must contain at least one special character")
+];
+
+export const verifyOtpValidator = [
+    body("email")
+        .trim()
+        .notEmpty()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Please provide a valid email")
+        .normalizeEmail(),
+
+    body("otp")
+        .trim()
+        .notEmpty()
+        .withMessage("otp is required")
+        .isLength({ min: 6, max: 6 })
+        .withMessage("otp must be 6 digits"),
 ];
 
 export const loginValidator = [
