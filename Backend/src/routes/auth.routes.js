@@ -4,7 +4,7 @@ import { validate } from "../middlewares/validate.middleware.js";
 import { googleLoginValidator, loginValidator, signupValidator } from "../validators/auth.validator.js";
 import { resolveGoogleIdToken, verifyJWT } from "../middlewares/auth.middleware.js";
 import rateLimiter from "../middlewares/rateLimiter.middleware.js";
-import { DEFAULT_RATE } from "../config/rates.js";
+import * as rates from "../config/rates.js";
 
 
 const router = Router();
@@ -17,6 +17,7 @@ router.get("/rate-limit-test", rateLimiter(), (req, res) => {
 
 router.post(
     "/signup",
+    rateLimiter(rates.STRICT_RATE),
     signupValidator,
     validate,
     authController.signup
@@ -24,11 +25,13 @@ router.post(
 
 router.post(
     "/verifyOtp",
+    rateLimiter(rates.STRICT_RATE),
     authController.verifyOtp
 );
 
 router.post(
     "/login",
+    rateLimiter(rates.LENIENT_RATE),
     loginValidator,
     validate,
     authController.login
@@ -37,22 +40,26 @@ router.post(
 router.post(
     "/logout",
     verifyJWT,
+    rateLimiter(rates.LENIENT_RATE),
     authController.logout
 );
 
 router.post(
     "/refresh-token",
+    rateLimiter(rates.STRICT_RATE),
     authController.refreshAccessToken
 );
 
 router.get(
     "/me",
     verifyJWT,
+    rateLimiter(rates.STRICT_RATE),
     authController.getCurrentUser
 );
 
 router.post(
     "/google",
+    rateLimiter(rates.STRICT_RATE),
     resolveGoogleIdToken,
     googleLoginValidator,
     validate,
