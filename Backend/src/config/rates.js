@@ -5,8 +5,8 @@ class Rate {
     }
 }
 
-export const DEFAULT_RATE = new Rate(5, 60);
+export const DEFAULT_RATE = new Rate(2, 5);
 
-export const STRICT_RATE = new Rate(10, 60);
+export const STRICT_RATE = new Rate(3, 10);
 
-export const LENIENT_RATE = new Rate(120, 60);
+export const LENIENT_RATE = new Rate(1, 1);

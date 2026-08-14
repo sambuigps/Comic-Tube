@@ -1,44 +1,32 @@
 import { DEFAULT_RATE } from "../config/rates.js";
 import { redis } from "../config/redis.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const rateLimiter = ({ Limit, WindowSeconds } = DEFAULT_RATE) => {
-    return async (req, res, next) => {
-        try {
-            const ip = req.ip;
-            const unique_id = req.headers["x-client-id"];
+    return asyncHandler(async (req, res, next) => {
+        const ip = req.ip;
+        const userId = req.user?._id;
 
-            if (!unique_id) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Unique Id is not found in request header"
-                })
-            }
+        const key = userId ? `userId:${userId}` : `ip:${ip}`;
 
-            const key = `rate_limit:${ip}:${unique_id}`;
+        const count = await redis.incr(key);
 
-            const count = await redis.incr(key);
+        const ttl = await redis.ttl(key);
 
-            const ttl = await redis.ttl(key);
-
-            if (ttl === -1) {
-                await redis.expire(key, WindowSeconds);
-            }
-            console.log("TTL:", ttl);
-
-            if (count > Limit) {
-                return res.status(429).json({
-                    success: false,
-                    message: "Too many requests, please try again later"
-                })
-            }
-
-            next();
-
-        } catch (err) {
-            console.error("Rate limiter error", err);
-            next();
+        if (ttl === -1) {
+            await redis.expire(key, WindowSeconds);
         }
-    }
+        // console.log("TTL:", ttl);
+
+        if (count > Limit) {
+            return res.status(429).json({
+                success: false,
+                message: "Too many requests, please try again later"
+            })
+        }
+
+        next();
+    });
 }
 
 export default rateLimiter;
