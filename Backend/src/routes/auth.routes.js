@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as authController from "../controllers/auth.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { googleLoginValidator, loginValidator, signupValidator } from "../validators/auth.validator.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { resolveGoogleIdToken, verifyJWT } from "../middlewares/auth.middleware.js";
 import rateLimiter from "../middlewares/rateLimiter.middleware.js";
 import { DEFAULT_RATE } from "../config/config.js";
 
@@ -52,6 +52,7 @@ router.get(
 
 router.post(
     "/google",
+    resolveGoogleIdToken,
     googleLoginValidator,
     validate,
     authController.googleLogin
