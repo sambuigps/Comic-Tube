@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
+import comicRouter from "./routes/comic.routes.js";
 import { CORS_ORIGIN } from "./config/config.js";
 
 const app = express();
@@ -17,5 +18,6 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
+app.use("/api/comic", comicRouter);
 
 export { app };
