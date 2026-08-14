@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Sukhman3125/Visual-Comic-Mania#readme",
   "dependencies": {
+    "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
