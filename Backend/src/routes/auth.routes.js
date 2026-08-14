@@ -3,8 +3,16 @@ import * as authController from "../controllers/auth.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { googleLoginValidator, loginValidator, signupValidator } from "../validators/auth.validator.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import rateLimiter from "../middlewares/rateLimiter.middleware.js";
+import { DEFAULT_RATE } from "../config/config.js";
 
 const router = Router();
+router.get("/rate-limit-test", rateLimiter(DEFAULT_RATE), (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "lalalalla",
+    })
+});
 
 router.post(
     "/signup",
