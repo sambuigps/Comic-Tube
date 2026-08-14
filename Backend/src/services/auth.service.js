@@ -7,18 +7,23 @@ import { PendingUser } from "../models/pendingUser.model.js";
 import generateOtp from "../Factories/otp.factory.js";
 import sendMail from "../utils/mailer.js";
 import signUpOtpEmail from "../Factories/signUpOtpEmail.factory.js";
-import { AUTH_OTP_EXPIRY, GOOGLE_CLIENT_ID, REFRESH_TOKEN_SECRET } from "../config/config.js";
+import { AUTH_OTP_EXPIRY, GOOGLE_CLIENT, REFRESH_TOKEN_SECRET } from "../config/config.js";
 
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+const googleClient = {
+    web: new OAuth2Client(GOOGLE_CLIENT.WEB.ID),
+    app: new OAuth2Client(GOOGLE_CLIENT.APP.ID)
+}
 
-const googleLogin = async ({ idToken }) => {
+const googleLogin = async ({ platformType, idToken }) => {
     if (!idToken) {
         throw new ApiError(400, "Google ID token is required");
     }
+    const client = platformType=="web"?googleClient.web:googleClient.app;
+    const audience = platformType=="web"?GOOGLE_CLIENT.WEB.ID:GOOGLE_CLIENT.APP.ID;
 
-    const ticket = await googleClient.verifyIdToken({
+    const ticket = await client.verifyIdToken({
         idToken,
-        audience: GOOGLE_CLIENT_ID,
+        audience,
     });
 
     const payload = ticket.getPayload();

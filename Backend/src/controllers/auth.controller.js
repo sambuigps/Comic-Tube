@@ -157,24 +157,37 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const googleLogin = asyncHandler(async (req, res) => {
-    const { idToken } = req.body;
+    const { platformType, idToken } = req.body;
     const {
         user,
         accessToken,
         refreshToken,
-    } = await authService.googleLogin({ idToken });
+    } = await authService.googleLogin({ platformType, idToken });
 
-    return res
-        .status(200)
-        .cookie("accessToken", accessToken, accessTokenOptions)
-        .cookie("refreshToken", refreshToken, refreshTokenOptions)
-        .json(
-            new ApiResponse(
-                200,
-                user,
-                "Google login successful"
-            )
-        );
+    if (platformType === "web") {
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, accessTokenOptions)
+            .cookie("refreshToken", refreshToken, refreshTokenOptions)
+            .json(
+                new ApiResponse(
+                    200,
+                    user,
+                    "User logged in successfully"
+                )
+            );
+    }
+    else {
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { user, accessToken, refreshToken },
+                    "User logged in successfully"
+                )
+            );
+    }
 });
 
 export {
