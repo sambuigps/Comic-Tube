@@ -4,13 +4,14 @@ import { validate } from "../middlewares/validate.middleware.js";
 import { googleLoginValidator, loginValidator, signupValidator } from "../validators/auth.validator.js";
 import { resolveGoogleIdToken, verifyJWT } from "../middlewares/auth.middleware.js";
 import rateLimiter from "../middlewares/rateLimiter.middleware.js";
-import { DEFAULT_RATE } from "../config/config.js";
+import { DEFAULT_RATE } from "../config/rates.js";
+
 
 const router = Router();
-router.get("/rate-limit-test", rateLimiter(DEFAULT_RATE), (req, res) => {
+router.get("/rate-limit-test", rateLimiter(), (req, res) => {
     res.status(200).json({
         success: true,
-        message: "lalalalla",
+        message: "rate limiter has not reached its limit yet!",
     })
 });
 

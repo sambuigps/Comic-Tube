@@ -1,6 +1,7 @@
+import { DEFAULT_RATE } from "../config/rates.js";
 import { redis } from "../config/redis.js";
 
-const rateLimiter = ({LIMIT, WINDOW}) => {
+const rateLimiter = ({ Limit, WindowSeconds } = DEFAULT_RATE) => {
     return async (req, res, next) => {
         try {
             const ip = req.ip;
@@ -20,11 +21,11 @@ const rateLimiter = ({LIMIT, WINDOW}) => {
             const ttl = await redis.ttl(key);
 
             if (ttl === -1) {
-                await redis.expire(key, WINDOW);
+                await redis.expire(key, WindowSeconds);
             }
-            // console.log("TTL:", ttl);
+            console.log("TTL:", ttl);
 
-            if (count > LIMIT) {
+            if (count > Limit) {
                 return res.status(429).json({
                     success: false,
                     message: "Too many requests, please try again later"
