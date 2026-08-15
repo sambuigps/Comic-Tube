@@ -7,7 +7,8 @@ const rateLimiter = ({ Limit, WindowSeconds } = DEFAULT_RATE) => {
         const ip = req.ip;
         const userId = req.user?._id;
 
-        const key = userId ? `userId:${userId}` : `ip:${ip}`;
+        let key = userId ? `userId:${userId}` : `ip:${ip}`;
+        key += `${req.originalUrl.split("?")[0]}`;
 
         const count = await redis.incr(key);
 
