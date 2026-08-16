@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const comicSchema = new Schema({
     owner: {
@@ -6,14 +6,18 @@ const comicSchema = new Schema({
         ref: "User",
         required: true
     },
-    title:{
+    title: {
         type: String,
         required: true,
         unique: true,
         index: true
     },
-    description:{
+    description: {
         type: String,
+    },
+    chapterCount: {
+        type: Number,
+        default: 0
     },
     status: {
         type: String,
@@ -34,9 +38,9 @@ const comicSchema = new Schema({
         default: 0
     },
 },
-{
-    timestamps: true
-});
+    {
+        timestamps: true
+    });
 
 comicSchema.index({ owner: 1 });
 

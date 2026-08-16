@@ -25,14 +25,14 @@ const uploadSingle = asyncHandler(async (req, res) => {
     const uploadDir = req.uploadDir;
     const { comicId } = req.body;
 
-    const cloudinaryURL = await chapterService.uploadSingle({ userId, file, comicId, uploadDir });
+    const chapter = await chapterService.uploadSingle({ userId, comicId, file, uploadDir });
 
     return res
         .status(200, "Chapter uploaded successfully")
         .json(
             new ApiResponse(
                 200,
-                cloudinaryURL,
+                chapter,
                 "Chapter uploaded successfully"
             )
         );

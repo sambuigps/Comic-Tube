@@ -7,10 +7,9 @@ const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const uuid = crypto.randomUUID();
         const uploadDir = path.join(process.cwd(), "public", "temp", uuid);
-        console.log(uploadDir);
+
         fs.mkdir(uploadDir, { recursive: true })
             .then(() => {
-                req.uploadDir = uploadDir;
                 cb(null, uploadDir);
             })
             .catch((err) => {

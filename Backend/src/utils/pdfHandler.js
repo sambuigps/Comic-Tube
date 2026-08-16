@@ -14,10 +14,10 @@ export const extractImages = async (file, fileDir) => {
     await fs.mkdir(outputDir, { recursive: true });
     const output = path.join(outputDir, "page");
 
-    console.log(output);
     await poppler.pdfImages(file, output, {
         allFiles: true,
     });
 
-    return outputDir;
+    const images = await fs.readdir(outputDir);
+    return images.map(file => path.join(outputDir, file));
 }
