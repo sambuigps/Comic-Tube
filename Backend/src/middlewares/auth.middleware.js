@@ -41,10 +41,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 export const resolveGoogleIdToken = asyncHandler(async (req, res, next) => {
     const { platformType } = req.body;
 
-    if (!platformType || !["web", "app"].includes(platformType)) {
-        throw new ApiError(400, "Must specify platform type!");
-    }
-
     if (platformType === "web") return next();
 
     const { code, codeVerifier, redirectUri } = req.body;
