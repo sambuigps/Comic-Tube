@@ -11,6 +11,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
         req.cookies?.accessToken ||
         req.header("Authorization")?.replace("Bearer ", "");
 
+    // console.log(req.cookies);
     if (!token) {
         throw new ApiError(401, "Unauthorized request");
     }
@@ -39,10 +40,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
 export const resolveGoogleIdToken = asyncHandler(async (req, res, next) => {
     const { platformType } = req.body;
-
-    if (!platformType || !["web", "app"].includes(platformType)) {
-        throw new ApiError(400, "Must specify platform type!");
-    }
 
     if (platformType === "web") return next();
 

@@ -19,4 +19,21 @@ const getUserComics = asyncHandler(async (req, res) => {
         );
 });
 
-export { getUserComics };
+const createComic = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const comicData = req.body;
+
+    const new_comic = await comicService.createComic({userId, comicData});
+
+    return res
+    .status(200, "Comic created successfully")
+    .json(
+        new ApiResponse(
+            200,
+            new_comic,
+            "Comic created successfully"
+        )
+    )
+})
+
+export { getUserComics, createComic };
