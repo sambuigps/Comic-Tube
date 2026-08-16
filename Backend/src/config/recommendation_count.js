@@ -1,0 +1,1 @@
+export const RECOMMENDATION_COUNT = 10
