@@ -9,7 +9,7 @@ const getUserComics = asyncHandler(async (req, res) => {
     const userComics = await comicService.getUserComics({ userId });
 
     return res
-        .status(200, "User comics fetched successfully")
+        .status(200)
         .json(
             new ApiResponse(
                 200,

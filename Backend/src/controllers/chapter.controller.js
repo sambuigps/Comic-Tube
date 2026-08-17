@@ -5,11 +5,12 @@ import * as chapterService from "../services/chapter.service.js";
 
 const getComicChapters = asyncHandler(async (req, res) => {
     const userId = req.user._id;
+    const { comicId } = req.body;
 
     const comicChapters = await chapterService.getComicChapters({ userId, comicId });
 
     return res
-        .status(200, "Comic chapters fetched successfully")
+        .status(200)
         .json(
             new ApiResponse(
                 200,
@@ -28,7 +29,7 @@ const uploadSingle = asyncHandler(async (req, res) => {
     const chapter = await chapterService.uploadSingle({ userId, comicId, file, uploadDir });
 
     return res
-        .status(200, "Chapter uploaded successfully")
+        .status(200)
         .json(
             new ApiResponse(
                 200,

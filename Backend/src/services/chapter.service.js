@@ -6,13 +6,14 @@ import { ApiError } from "../utils/ApiError.js";
 import { extractImages, getImageCount } from "../utils/pdfHandler.js";
 import path from "path";
 import fs from "fs/promises";
+import { removeDirectory } from "../utils/fileHandler.js";
 
 const getComicChapters = async function ({ userId, comicId }) {
     const comic = await Comic.findById(comicId);
     if (!comic)
-        throw new Error(400, "Comic does not exist");
+        throw new ApiError(400, "Comic does not exist");
     if (comic.owner.toString() !== userId.toString())
-        throw new Error(403, "Comic is private");
+        throw new ApiError(403, "Comic is private");
 
     const comicChapters = await Chapter.find({ comic: comicId });
     return comicChapters;
@@ -47,14 +48,9 @@ const uploadSingle = async function ({ userId, comicId, file, title }) {
     } catch (err) {
         if (err instanceof ApiError)
             throw err;
-        
+
         console.error(err)
         throw new ApiError(500, "Internal Server Error");
-    } finally {
-        await fs.rm(file.destination, {
-            recursive: true,
-            force: true
-        });
     }
 
     const chapterCount = comic.chapterCount;
