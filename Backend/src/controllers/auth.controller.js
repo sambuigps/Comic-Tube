@@ -17,7 +17,7 @@ const signup = asyncHandler(async (req, res) => {
     });
 
     return res
-        .status(200, "Otp sent successfully")
+        .status(200)
         .json(
             new ApiResponse(
                 200,
