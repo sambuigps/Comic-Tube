@@ -1,13 +1,16 @@
+import ms from "ms";
+import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/config.js";
+
 export const accessTokenOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 15 * 60 * 1000, 
+    maxAge: ms(ACCESS_TOKEN_EXPIRY), 
 };
 
 export const refreshTokenOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    maxAge: ms(REFRESH_TOKEN_EXPIRY), 
 };

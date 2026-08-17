@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
 import comicRouter from "./routes/comic.routes.js";
 import chapterRouter from "./routes/chapter.routes.js";
+import dashboardRouter from "./routes/dashboard.routes.js"
 import { CORS_ORIGIN } from "./config/config.js";
 import { cleanupMiddleware } from "./middlewares/cleanup.middleware.js";
 
@@ -22,5 +23,6 @@ app.use(cleanupMiddleware);
 app.use("/api/auth", authRouter);
 app.use("/api/comic", comicRouter);
 app.use("/api/chapter", chapterRouter);
+app.use("/api/dashboard", dashboardRouter)
 
 export { app };

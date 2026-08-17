@@ -13,6 +13,10 @@ router.get(
     comicController.getUserComics
 );
 
-
+router.post(
+    "/newComic",
+    verifyJWT,
+    comicController.createComic
+)
 
 export default router;

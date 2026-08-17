@@ -5,6 +5,7 @@ import { googleLoginValidator, loginValidator, signupValidator } from "../valida
 import { resolveGoogleIdToken, verifyJWT } from "../middlewares/auth.middleware.js";
 import rateLimiter from "../middlewares/rateLimiter.middleware.js";
 import * as rates from "../config/rates.js";
+import validatePlatform from "../middlewares/validatePlatform.middleware.js";
 
 
 const router = Router();
@@ -25,12 +26,14 @@ router.post(
 
 router.post(
     "/verifyOtp",
+    validatePlatform,
     rateLimiter(rates.STRICT_RATE),
     authController.verifyOtp
 );
 
 router.post(
     "/login",
+    validatePlatform,
     rateLimiter(rates.LENIENT_RATE),
     loginValidator,
     validate,
@@ -39,6 +42,7 @@ router.post(
 
 router.post(
     "/logout",
+    validatePlatform,
     verifyJWT,
     rateLimiter(rates.LENIENT_RATE),
     authController.logout
@@ -46,6 +50,7 @@ router.post(
 
 router.post(
     "/refresh-token",
+    validatePlatform,
     rateLimiter(rates.STRICT_RATE),
     authController.refreshAccessToken
 );
@@ -59,6 +64,7 @@ router.get(
 
 router.post(
     "/google",
+    validatePlatform,
     rateLimiter(rates.STRICT_RATE),
     resolveGoogleIdToken,
     googleLoginValidator,
