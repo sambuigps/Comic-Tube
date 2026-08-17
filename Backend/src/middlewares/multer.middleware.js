@@ -39,3 +39,33 @@ export const upload = multer({
         cb(null, true);
     }
 });
+
+export const uploadImage = multer({
+    storage,
+    limits: {
+        fileSize: fileSizeLimit,
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedExtensions = [
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        ];
+
+        const extension = path
+            .extname(file.originalname)
+            .toLowerCase();
+
+        if (!allowedExtensions.includes(extension)) {
+            return cb(
+                new ApiError(
+                    400,
+                    "Only JPG, JPEG, PNG and WEBP files are allowed"
+                )
+            );
+        }
+
+        cb(null, true);
+    }
+});

@@ -37,11 +37,17 @@ const comicSchema = new Schema({
         type: Number,
         default: 0
     },
+    coverImg:{
+        type: String,
+        default: null
+    }
 },
     {
         timestamps: true
     });
 
 comicSchema.index({ owner: 1 });
+comicSchema.index({ visibility: 1, starCnt: -1, viewCnt: -1 });
+comicSchema.index({ visibility: 1, createdAt: -1 });
 
 export const Comic = mongoose.model("Comic", comicSchema);
