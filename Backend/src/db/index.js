@@ -4,9 +4,11 @@ import { MONGODB_URI } from "../config/config.js";
 
 const connectDB = async () => {
     try {
-        const connectionInstance = await mongoose.connect(`${MONGODB_URI}/${DB_NAME}`);
+        const connectionInstance = await mongoose.connect(
+            `${MONGODB_URI.replace(/\/?\?/, `/${DB_NAME}?`)}`
+        );
         console.log(`\nMongoDB connected, DB Host: ${connectionInstance.connection.host}`);
-    } catch(error){
+    } catch (error) {
         console.log("MongoDB connection error ", error);
         process.exit(1);
     }
